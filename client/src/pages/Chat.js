@@ -3,6 +3,8 @@ import socketIOClient from 'socket.io-client';
 import Moment from 'react-moment';
 import './Chat.css';
 
+let socket;
+
 class Chat extends Component {
   constructor() {
     super();
@@ -13,14 +15,15 @@ class Chat extends Component {
       newMessage: '',
       userLocation: '',
       disabled: false,
-      endpoint: 'http://localhost:5000'
+      endpoint: 'http://localhost:5000/'
     };
+
+    socket = socketIOClient(this.state.endpoint);
   }
 
   componentDidMount() {
-    console.log('mount');
-    const { endpoint, globalMessage, messages } = this.state;
-    const socket = socketIOClient(endpoint);
+    console.log(this.props);
+    const { globalMessage } = this.state;
     socket.on('countUpdated', newCount => this.setState({ count: newCount }));
     socket.on('message', globalMessage => this.setState({ globalMessage }));
 
@@ -50,8 +53,6 @@ class Chat extends Component {
   }
 
   incrementCount = () => {
-    const { endpoint } = this.state;
-    const socket = socketIOClient(endpoint);
     socket.emit('increment');
     socket.on('countUpdated', newCount => this.setState({ count: newCount }));
   };
@@ -64,8 +65,7 @@ class Chat extends Component {
     e.preventDefault();
     this.setState({ disabled: true });
 
-    const { endpoint, messages, newMessage } = this.state;
-    const socket = socketIOClient(endpoint);
+    const { newMessage } = this.state;
     socket.emit('sendMessage', newMessage, message => {
       console.log('the message was delivered', message);
     });
@@ -83,20 +83,19 @@ class Chat extends Component {
   };
 
   render() {
-    const { userLocation, globalMessage, messages, disabled } = this.state;
+    const { globalMessage, messages, disabled } = this.state;
     return (
       <div className="main">
         <h1>
           {globalMessage.text}
           <span>
-            {' '}
             <Moment format="h:mm a">{globalMessage.createdAt}</Moment>
           </span>
         </h1>
         <div className="messages">
           {messages.map((message, idx) => (
             <div
-              className={idx % 2 == 0 ? 'dark' : 'light'}
+              className={idx % 2 === 0 ? 'dark' : 'light'}
               dangerouslySetInnerHTML={this.createMarkup(message)}
             />
           ))}

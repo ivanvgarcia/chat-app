@@ -21,8 +21,14 @@ let userLocation;
 
 io.on('connection', socket => {
   console.log('New user connected');
+  socket.on('subscribeToTimer', interval => {
+    console.log('client is subscribing to timer with interval ', interval);
+    setInterval(() => {
+      client.emit('timer', new Date());
+    }, interval);
+  });
 
-  socket.emit('message', generateMessage('Welcome Brown People'));
+  socket.emit('message', generateMessage('Welcome to the Chat Application'));
   socket.broadcast.emit('message', generateMessage('A new user has Joined'));
 
   socket.emit('countUpdated', count);
