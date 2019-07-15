@@ -9,20 +9,21 @@ const publicPath = path.join(__dirname, '../public');
 const server = http.createServer(app);
 const io = socketIO(server);
 const cors = require('cors');
+const { generateMessage } = require('../utils/messages');
 
 app.use(cors());
 app.use(express.static(publicPath));
 
 let count = 0;
-const message = 'Welcome to Chat App';
+
 let chat = [];
 let userLocation;
 
 io.on('connection', socket => {
   console.log('New user connected');
 
-  socket.emit('message', message);
-  socket.broadcast.emit('message', 'A new user has joined');
+  socket.emit('message', generateMessage('Welcome Brown People'));
+  socket.broadcast.emit('message', generateMessage('A new user has Joined'));
 
   socket.emit('countUpdated', count);
 
@@ -42,13 +43,13 @@ io.on('connection', socket => {
     userLocation = `https://google.com/maps/?q=${location.latitude},${
       location.longitude
     }`;
-    chat.push(`<a href=${userLocation}>New User Joined</a>`);
+    chat.push(`<a href=${userLocation}>My Current Location</a>`);
     io.emit('allMessages', chat);
     callback('location sent');
   });
 
   socket.on('disconnect', () => {
-    io.emit('message', 'A user has left');
+    io.emit('message', generateMessage('A User Left'));
   });
 });
 
