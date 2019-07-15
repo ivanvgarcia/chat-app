@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server/server.js"
+    "start": "nodemon server/server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm start server/server.js\" \"npm run client\""
   },
   "engines": {
     "node": "10.7.0"
@@ -12,7 +14,10 @@
   "author": "Ivan Garcia",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3"
+    "concurrently": "^4.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.16.3",
+    "nodemon": "^1.19.1"
   },
   "devDependencies": {
     "socket.io": "^2.1.1"

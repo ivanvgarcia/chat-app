@@ -1,0 +1,63 @@
+body {
+  background: rgb(245, 239, 239);
+
+}
+
+
+
+.form {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100px;
+  background: darkcyan;
+  display: flex;
+  justify-content: stretch;
+}
+
+.form input {
+  flex: 75%;
+}
+
+button {
+  background: darkcyan;
+  color: white;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: white;
+  font-weight: 600;
+}
+
+.dark,
+.light {
+  padding: 10px;
+  border-radius: 40px;
+  margin: 5px 2px;
+  min-width: 400px;
+  ;
+}
+
+.dark {
+  background: darkcyan;
+  color: #fff;
+  align-self: flex-end;
+}
+
+.light {
+  background: #ccc;
+  align-self: flex-start;
+
+}
