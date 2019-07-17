@@ -1,3 +1,4 @@
+require('dotenv').config();
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
@@ -13,7 +14,16 @@ const {
   getUser,
   getUsersInRoom
 } = require('../utils/users');
+const mongoose = require('mongoose');
+const User = require('../models/User');
+const DB = process.env.DATABASE;
 
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useFindAndModify: false
+  })
+  .then(() => console.log('You have been connected to MONGO ATLAS'));
 app.use(cors());
 
 let count = 0;
@@ -24,7 +34,8 @@ let userLocation;
 io.on('connection', socket => {
   console.log('New user connected');
 
-  socket.on('join', ({ username, room }, callback) => {
+  socket.on('join', async ({ username, room }, callback) => {
+    // const user = await User.create({ name: username, room });
     const { error, user } = addUser({ id: socket.id, username, room });
 
     if (error) {
