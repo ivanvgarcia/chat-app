@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import socketIOClient from 'socket.io-client';
 import Moment from 'react-moment';
+import SocketContext from '../SocketContext';
 import './Chat.css';
-
-let socket;
 
 class Chat extends Component {
   constructor() {
@@ -14,17 +12,13 @@ class Chat extends Component {
       messages: [],
       newMessage: '',
       userLocation: '',
-      disabled: false,
-      endpoint: 'http://localhost:5000/'
+      disabled: false
     };
-
-    socket = socketIOClient(this.state.endpoint);
   }
 
   componentDidMount() {
-    console.log(this.props);
+    const { socket } = this.props;
     const { globalMessage } = this.state;
-    socket.on('countUpdated', newCount => this.setState({ count: newCount }));
     socket.on('message', globalMessage => this.setState({ globalMessage }));
 
     socket.on('allMessages', messages =>
@@ -53,6 +47,8 @@ class Chat extends Component {
   }
 
   incrementCount = () => {
+    const { socket } = this.props;
+
     socket.emit('increment');
     socket.on('countUpdated', newCount => this.setState({ count: newCount }));
   };
@@ -62,6 +58,8 @@ class Chat extends Component {
   };
 
   handleSubmit = e => {
+    const { socket } = this.props;
+
     e.preventDefault();
     this.setState({ disabled: true });
 
@@ -116,4 +114,10 @@ class Chat extends Component {
   }
 }
 
-export default Chat;
+const ChatSocket = props => (
+  <SocketContext.Consumer>
+    {socket => <Chat {...props} socket={socket} />}
+  </SocketContext.Consumer>
+);
+
+export default ChatSocket;

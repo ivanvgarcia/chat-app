@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
+import SocketContext from '../SocketContext';
 
-const JoinChat = ({ history }) => {
+const JoinChat = ({ socket, history, match, ...props }) => {
   const [username, setUsername] = useState('');
   const [room, setRoom] = useState('');
+  const [alert, setAlert] = useState('');
 
   const handleSubmit = e => {
     e.preventDefault();
-    history.push(`/chat/${username}/${room}`);
+    socket.emit('join', { username, room }, error => setAlert(error));
+    // history.push(`/chat/${username}/${room}`);
   };
 
   return (
     <div>
       <h1>Join Chat</h1>
+      {alert}
       <form onSubmit={handleSubmit}>
         <label htmlFor="name">User Name</label>
         <input
@@ -29,7 +33,6 @@ const JoinChat = ({ history }) => {
           name="room"
           value={room}
           onChange={e => setRoom(e.target.value)}
-          required
         />
         <button>Join</button>
       </form>
@@ -37,4 +40,10 @@ const JoinChat = ({ history }) => {
   );
 };
 
-export default withRouter(JoinChat);
+const JoinChatSocket = props => (
+  <SocketContext.Consumer>
+    {socket => <JoinChat {...props} socket={socket} />}
+  </SocketContext.Consumer>
+);
+
+export default withRouter(JoinChatSocket);

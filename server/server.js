@@ -1,18 +1,20 @@
-const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
-
 const app = express();
 const port = process.env.PORT || 5000;
-const publicPath = path.join(__dirname, '../public');
 const server = http.createServer(app);
 const io = socketIO(server);
 const cors = require('cors');
 const { generateMessage } = require('../utils/messages');
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom
+} = require('../utils/users');
 
 app.use(cors());
-app.use(express.static(publicPath));
 
 let count = 0;
 
@@ -21,27 +23,35 @@ let userLocation;
 
 io.on('connection', socket => {
   console.log('New user connected');
-  socket.on('subscribeToTimer', interval => {
-    console.log('client is subscribing to timer with interval ', interval);
-    setInterval(() => {
-      client.emit('timer', new Date());
-    }, interval);
-  });
 
-  socket.emit('message', generateMessage('Welcome to the Chat Application'));
-  socket.broadcast.emit('message', generateMessage('A new user has Joined'));
+  socket.on('join', ({ username, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, username, room });
 
-  socket.emit('countUpdated', count);
+    if (error) {
+      return callback(error);
+    }
 
-  socket.on('increment', () => {
-    count++;
-    io.emit('countUpdated', count);
+    socket.join(user.room);
+
+    socket.emit('message', generateMessage('Welcome to the Chat Application'));
+
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        'message',
+        generateMessage(`${user.username} has joined the chat!`)
+      );
+
+    callback();
   });
 
   socket.on('sendMessage', (message, callback) => {
     console.log(chat);
+
     chat.push(`<p>${message}</p>`);
-    io.emit('allMessages', chat);
+
+    io.to('test').emit('allMessages', chat);
+
     callback('Delivered!');
   });
 
