@@ -9,8 +9,12 @@ const JoinChat = ({ socket, history, match, ...props }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    socket.emit('join', { username, room }, error => setAlert(error));
-    // history.push(`/chat/${username}/${room}`);
+    socket.emit('join', { username, room }, error => {
+      if (error) {
+        return setAlert(error);
+      }
+      history.push(`/chat/${username}/${room}`);
+    });
   };
 
   return (

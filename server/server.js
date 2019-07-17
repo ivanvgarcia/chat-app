@@ -65,7 +65,14 @@ io.on('connection', socket => {
   });
 
   socket.on('disconnect', () => {
-    io.emit('message', generateMessage('A User Left'));
+    const user = removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        'message',
+        generateMessage(`${user.username} has left the building!`)
+      );
+    }
   });
 });
 
