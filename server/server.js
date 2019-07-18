@@ -26,8 +26,6 @@ mongoose
   .then(() => console.log('You have been connected to MONGO ATLAS'));
 app.use(cors());
 
-let count = 0;
-
 let chat = [];
 let userLocation;
 
